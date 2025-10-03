@@ -1,4 +1,4 @@
-package com.wahiemwonderemporium.inventoryms.model;
+package com.wahiemWonderEmporium.inventoryms.model;
 
 
 import jakarta.persistence.*;

@@ -1,9 +1,10 @@
-package com.wahiemwonderemporium.inventoryms.utils;
+package com.wahiemWonderEmporium.inventoryms.utils;
 
 
-import com.wahiemwonderemporium.inventoryms.model.Inventory;
-import com.wahiemwonderemporium.inventoryms.model.viewModel.InventoryRequest;
-import com.wahiemwonderemporium.inventoryms.model.viewModel.InventoryResponse;
+
+import com.wahiemWonderEmporium.inventoryms.model.Inventory;
+import com.wahiemWonderEmporium.inventoryms.model.viewModel.InventoryRequest;
+import com.wahiemWonderEmporium.inventoryms.model.viewModel.InventoryResponse;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.UtilityClass;

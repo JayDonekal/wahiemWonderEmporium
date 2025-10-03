@@ -1,6 +1,8 @@
 package com.wahiemwonderemporium.ordersms.service;
 
 import com.wahiemwonderemporium.ordersms.model.Order;
+import com.wahiemwonderemporium.ordersms.model.OrderLineItems;
+import com.wahiemwonderemporium.ordersms.model.viewModels.InventoryResponse;
 import com.wahiemwonderemporium.ordersms.model.viewModels.OrderRequest;
 import com.wahiemwonderemporium.ordersms.model.viewModels.OrderResponse;
 import com.wahiemwonderemporium.ordersms.repository.OrderRepository;
@@ -9,8 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wahiemwonderemporium.ordersms.utils.Converters.mapToOrder;
@@ -22,10 +26,35 @@ import static com.wahiemwonderemporium.ordersms.utils.Converters.mapToOrderRespo
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final WebClient webClient;
 
     public OrderResponse placeOrder(@RequestBody OrderRequest orderRequest) {
         log.info("Order Request Received");
-        return mapToOrderResponse(orderRepository.save(mapToOrder(orderRequest)));
+
+        Order order = mapToOrder(orderRequest);
+
+        //Getting list of skuCode to make sure all line-items in the requested order is in inventory stock
+        List<String> skuCodesList = order.getOrderLineItemsList().stream().map(OrderLineItems::getSkuCode).toList();
+
+        // call inventory-service and check if skuCodesList items are in stock before saving
+      InventoryResponse[] inventoryResponseList = webClient.get()
+                .uri("http://localhost:8083/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCodes", skuCodesList).build())
+                .retrieve()
+                .bodyToMono(InventoryResponse[].class)
+                .block();
+      //temporarily making this false until inventory response changes to true if all is in stock
+        boolean allProductsInStock = false;
+        if(inventoryResponseList.length > 0) {
+            allProductsInStock = Arrays.stream(inventoryResponseList).allMatch(InventoryResponse::isInStock);
+        }
+        if(allProductsInStock){
+           orderRepository.save(order);
+        }
+        else{
+            throw new IllegalArgumentException("Product not available");
+        }
+
+        return mapToOrderResponse(order);
     }
 
     public List<OrderResponse> getOrders() {

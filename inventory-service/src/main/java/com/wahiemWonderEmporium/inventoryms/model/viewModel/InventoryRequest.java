@@ -1,4 +1,4 @@
-package com.wahiemwonderemporium.inventoryms.model.viewModel;
+package com.wahiemWonderEmporium.inventoryms.model.viewModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

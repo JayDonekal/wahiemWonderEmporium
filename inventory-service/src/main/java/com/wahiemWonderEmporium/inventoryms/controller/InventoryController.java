@@ -1,15 +1,16 @@
-package com.wahiemwonderemporium.inventoryms.controller;
+package com.wahiemWonderEmporium.inventoryms.controller;
 
-import com.wahiemwonderemporium.inventoryms.model.Inventory;
-import com.wahiemwonderemporium.inventoryms.model.viewModel.InventoryRequest;
-import com.wahiemwonderemporium.inventoryms.model.viewModel.InventoryResponse;
-import com.wahiemwonderemporium.inventoryms.service.InventoryService;
+import com.wahiemWonderEmporium.inventoryms.model.viewModel.InventoryRequest;
+import com.wahiemWonderEmporium.inventoryms.model.viewModel.InventoryResponse;
+import com.wahiemWonderEmporium.inventoryms.service.InventoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.wahiemwonderemporium.inventoryms.utils.Converters.mapToInventoryResponse;
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -18,10 +19,16 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @GetMapping("/{skuCode}")
-    public boolean isInStock(@PathVariable(value = "skuCode") String skuCode) {
-        return inventoryService.isInStock(skuCode);
+    @GetMapping
+    public List<InventoryResponse> isInStock(@RequestParam List<String> skuCodes) {
+        return inventoryService.isInStock(skuCodes);
     }
+
+    @GetMapping("/all")
+    public List<InventoryResponse> getAllInventory() {
+        return inventoryService.getAllInventory();
+    }
+
 
     @PostMapping
     public ResponseEntity<InventoryResponse> addNewInventory(@RequestBody InventoryRequest inventoryRequest) {
