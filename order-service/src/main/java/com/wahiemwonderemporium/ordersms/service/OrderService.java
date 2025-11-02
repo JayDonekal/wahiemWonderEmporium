@@ -9,11 +9,11 @@ import com.wahiemwonderemporium.ordersms.repository.OrderRepository;
 import com.wahiemwonderemporium.ordersms.utils.Converters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +28,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient webClient;
 
+    @Value("service.url.inventory")
+    private String inventoryUrl;
+
     public OrderResponse placeOrder(@RequestBody OrderRequest orderRequest) {
         log.info("Order Request Received");
 
@@ -37,16 +40,18 @@ public class OrderService {
         List<String> skuCodesList = order.getOrderLineItemsList().stream().map(OrderLineItems::getSkuCode).toList();
 
         // call inventory-service and check if skuCodesList items are in stock before saving
-      InventoryResponse[] inventoryResponseList = webClient.get()
-                .uri("http://localhost:8083/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCodes", skuCodesList).build())
+         InventoryResponse[] inventoryResponseList = webClient.get()
+                .uri(inventoryUrl+"/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCodes", skuCodesList).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
+
       //temporarily making this false until inventory response changes to true if all is in stock
         boolean allProductsInStock = false;
         if(inventoryResponseList.length > 0) {
             allProductsInStock = Arrays.stream(inventoryResponseList).allMatch(InventoryResponse::isInStock);
         }
+
         if(allProductsInStock){
            orderRepository.save(order);
         }
@@ -60,8 +65,7 @@ public class OrderService {
     public List<OrderResponse> getOrders() {
         log.info("Getting all orders");
         List<Order> orders = orderRepository.findAll();
-        List<OrderResponse> orderResponseList = orders.stream().map(Converters::mapToOrderResponse).toList();
-        return orderResponseList;
+        return orders.stream().map(Converters::mapToOrderResponse).toList();
 
     }
 }

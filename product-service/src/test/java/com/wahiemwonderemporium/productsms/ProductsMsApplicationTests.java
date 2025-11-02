@@ -52,7 +52,7 @@ class ProductsMsApplicationTests {
     private ProductRequest getProductRequest() {
         return ProductRequest.builder()
                 .name("Mr.puff paw keychains")
-                .description("Key chanins of puff paws")
+                .description("Key chains of puff paws")
                 .price(293f).build();
     }
 
