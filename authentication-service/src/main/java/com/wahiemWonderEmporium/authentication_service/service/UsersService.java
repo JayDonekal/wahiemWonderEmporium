@@ -33,8 +33,10 @@ public class UsersService {
         return savedUser;
     }
 
-    public Optional<Users> retrieveUserByUsername(String userName) {
-        return userRepository.findByUsername(userName);
+    public Users retrieveUserByUsername(String userName) {
+
+        return userRepository.findByUsername(userName)
+                .orElseThrow(() -> new DataAccessException("User not found") {});
     }
 
 }

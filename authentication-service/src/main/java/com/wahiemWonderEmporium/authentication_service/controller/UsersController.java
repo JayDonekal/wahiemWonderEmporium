@@ -37,8 +37,7 @@ public class UsersController {
     private ResponseEntity<UsersResponse> getUserByUsername(@PathVariable String username) {
         log.info("retrieving New User by username {}", username);
 
-        Users user = usersService.retrieveUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Users user = usersService.retrieveUserByUsername(username);
 
         return new ResponseEntity<>(usersDTOtoUsersResponse(user), HttpStatus.OK);
     }
