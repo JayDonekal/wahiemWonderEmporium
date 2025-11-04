@@ -26,6 +26,7 @@ public class Converters {
                 .id(inventory.getId())
                 .skuCode(inventory.getSkuCode())
                 .quantity(inventory.getQuantity())
+                .isInStock(inventory.getQuantity()>0?true:false)
                 .build();
     }
 }

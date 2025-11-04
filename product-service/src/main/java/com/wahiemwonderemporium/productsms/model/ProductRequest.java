@@ -14,4 +14,5 @@ public class ProductRequest {
     private String name;
     private String description;
     private Float price;
+    private String skuCode;
 }

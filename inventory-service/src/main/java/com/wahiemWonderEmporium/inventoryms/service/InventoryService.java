@@ -44,7 +44,7 @@ public class InventoryService {
                 inventoryRepository.findBySkuCodeIn(skuCodeList).stream()
                 .map(inventory ->{
                     InventoryResponse response = mapToInventoryResponse(inventory);
-                    response.setInStock(inventory.getQuantity() > 0);
+//                    response.setInStock(inventory.getQuantity() > 0);
                     return response;
                 }).toList();
 

@@ -16,6 +16,7 @@ public class Converters {
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
                 .price(productRequest.getPrice())
+                .skuCode(productRequest.getSkuCode())
                 .build();
     }
 
@@ -25,6 +26,7 @@ public class Converters {
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .skuCode(product.getSkuCode())
                 .build();
     }
 }
