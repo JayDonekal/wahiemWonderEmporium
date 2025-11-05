@@ -39,4 +39,10 @@ public class UsersService {
                 .orElseThrow(() -> new DataAccessException("User not found") {});
     }
 
+    public Users retrieveUserByEmail(String email) {
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new DataAccessException("User not found") {});
+    }
+
 }

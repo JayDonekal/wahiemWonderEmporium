@@ -19,5 +19,4 @@ public class UsersRequest {
     private String email;
     private String firstName;
     private String lastName;
-    private List<String> roles;
 }

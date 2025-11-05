@@ -13,8 +13,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Builder
-@Getter
-@Setter
 public class Users {
 
     @Id
@@ -30,16 +28,4 @@ public class Users {
     private List<String> roles;
 
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", roles=" + roles +
-                '}';
-    }
 }

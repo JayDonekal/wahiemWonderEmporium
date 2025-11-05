@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.wahiemWonderEmporium.authentication_service.utils.Converters.userRequestDTOtoUsers;
 import static com.wahiemWonderEmporium.authentication_service.utils.Converters.usersDTOtoUsersResponse;
 
@@ -27,17 +29,40 @@ public class UsersController {
 
         log.info("creating New User {}", usersRequest);
         Users user = userRequestDTOtoUsers(usersRequest);
+        user.setRoles(List.of("USER"));
         UsersResponse usersResponse = usersDTOtoUsersResponse(usersService.createNewUser(user));
 
         return new ResponseEntity<>(usersResponse, HttpStatus.CREATED);
     }
 
 
-    @GetMapping("/{username}")
+    //Never expose the admin user creation. This is only internal. Only Admins can create Admins, hence the duplication.
+    @PostMapping("/admin")
+    private ResponseEntity<UsersResponse> createNewAdminUser(@RequestBody UsersRequest usersRequest) {
+
+        log.info("creating New User {}", usersRequest);
+        Users user = userRequestDTOtoUsers(usersRequest);
+        user.setRoles(List.of("ADMIN"));
+        UsersResponse usersResponse = usersDTOtoUsersResponse(usersService.createNewUser(user));
+
+        return new ResponseEntity<>(usersResponse, HttpStatus.CREATED);
+    }
+
+
+    @GetMapping("/username/{username}")
     private ResponseEntity<UsersResponse> getUserByUsername(@PathVariable String username) {
         log.info("retrieving New User by username {}", username);
 
         Users user = usersService.retrieveUserByUsername(username);
+
+        return new ResponseEntity<>(usersDTOtoUsersResponse(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/email/{email}")
+    private ResponseEntity<UsersResponse> getUserByEmail(@PathVariable String email) {
+        log.info("retrieving New User by email {}", email);
+
+        Users user = usersService.retrieveUserByEmail(email);
 
         return new ResponseEntity<>(usersDTOtoUsersResponse(user), HttpStatus.OK);
     }

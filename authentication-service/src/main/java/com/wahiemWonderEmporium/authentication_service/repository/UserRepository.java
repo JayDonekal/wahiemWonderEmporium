@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends MongoRepository<Users, UUID> {
+public interface UserRepository extends MongoRepository<Users, String> {
 
     Optional<Users> findByUsername(String username);
-    Users findByEmail(String email);
+    Optional<Users> findByEmail(String email);
 }
