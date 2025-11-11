@@ -17,7 +17,6 @@ public class Converters {
                 .firstName(usersRequest.getFirstName())
                 .lastName(usersRequest.getLastName())
                 .password(usersRequest.getPassword())
-                .roles(usersRequest.getRoles())
                 .build();
         return users;
     }

@@ -26,7 +26,7 @@ public class UsersController {
 
     @PostMapping
     private ResponseEntity<UsersResponse> createNewUser(@RequestBody UsersRequest usersRequest) {
-
+// TODO : Check if user is not in the system before adding anything in.
         log.info("creating New User {}", usersRequest);
         Users user = userRequestDTOtoUsers(usersRequest);
         user.setRoles(List.of("USER"));
