@@ -21,7 +21,14 @@ public class UsersService {
 
     public Users createNewUser(Users users) {
         Users savedUser;
-
+        if(userRepository.existsByUsername(users.getUsername())) {
+            throw new DataAccessException("Username already exists!") {
+            };
+        }
+        if(userRepository.existsByEmail(users.getEmail())) {
+            throw new DataAccessException("Email already exists!") {
+            };
+        }
         try {
             savedUser = userRepository.save(users);
             log.info("User created {}", savedUser);
