@@ -4,10 +4,14 @@ import com.wahiemWonderEmporium.authentication_service.model.Users;
 import com.wahiemWonderEmporium.authentication_service.model.viewModel.UsersRequest;
 import com.wahiemWonderEmporium.authentication_service.model.viewModel.UsersResponse;
 import com.wahiemWonderEmporium.authentication_service.service.UsersService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,6 +63,7 @@ public class UsersController {
     }
 
     @GetMapping("/email/{email}")
+//    @PreAuthorize("hasRole('ADMIN')")
     private ResponseEntity<UsersResponse> getUserByEmail(@PathVariable String email) {
         log.info("retrieving New User by email {}", email);
 
@@ -66,6 +71,5 @@ public class UsersController {
 
         return new ResponseEntity<>(usersDTOtoUsersResponse(user), HttpStatus.OK);
     }
-
 
 }
