@@ -6,9 +6,8 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +16,7 @@ import java.util.Optional;
 public class UsersService {
 
     private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder;
 
     public Users createNewUser(Users users) {
         Users savedUser;
@@ -30,6 +29,7 @@ public class UsersService {
             };
         }
         try {
+            users.setPassword(passwordEncoder.encode(users.getPassword()));
             savedUser = userRepository.save(users);
             log.info("User created {}", savedUser);
         }
