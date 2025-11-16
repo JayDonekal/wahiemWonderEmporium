@@ -7,6 +7,7 @@ import com.wahiemwonderemporium.ordersms.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,14 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    private ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest) {
         return new ResponseEntity<>(orderService.placeOrder(orderRequest), HttpStatus.CREATED);
     }
 
+
     @GetMapping
-    private ResponseEntity<List<OrderResponse>> getAllOrders() {
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return new ResponseEntity<>(orderService.getOrders(), HttpStatus.OK);
     }
 }

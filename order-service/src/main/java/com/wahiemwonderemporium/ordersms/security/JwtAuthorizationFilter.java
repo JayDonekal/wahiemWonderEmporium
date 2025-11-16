@@ -1,4 +1,4 @@
-package com.wahiemWonderEmporium.authentication_service.security;
+package com.wahiemwonderemporium.ordersms.security;
 
 
 import jakarta.servlet.FilterChain;
@@ -10,13 +10,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +27,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -33,31 +35,35 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return; // IMPORTANT
+            return;
         }
 
-        final String jwt = authHeader.substring(7);
+        jwt = authHeader.substring(7);
+        username = jwtUtil.extractEmailFromToken(jwt);
 
-        String username = jwtUtil.extractEmailFromToken(jwt);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtUtil.validateToken(jwt)) {
 
-            if (jwtUtil.validateToken(jwt, userDetails)) {
+                List<SimpleGrantedAuthority> roles= jwtUtil.extractRolesFromToken(jwt);
 
-                // Only set auth if token is valid
-                List<SimpleGrantedAuthority> authorities = jwtUtil.extractRolesFromToken(jwt);
+                UserDetails userDetails = User
+                        .withUsername(username)
+                        .password("")
+                        .authorities(roles)
+                        .build();
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                authorities
+                                userDetails.getAuthorities()
                         );
-
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
@@ -68,5 +74,4 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

@@ -4,6 +4,7 @@ package com.wahiemWonderEmporium.authentication_service.service;
 import com.wahiemWonderEmporium.authentication_service.model.security.LoginRequest;
 import com.wahiemWonderEmporium.authentication_service.security.JwtUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class JwtService {
 ;
     private final JwtUtil jwtUtil;
@@ -22,7 +24,9 @@ public class JwtService {
         try {
            org.springframework.security.core.Authentication authenticate =  authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
             UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
+            log.info("Login Successfully"+userDetails);
             return jwtUtil.generateToken(userDetails);
         } catch (UsernameNotFoundException e){
             throw new UsernameNotFoundException(e.getMessage());

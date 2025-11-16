@@ -1,20 +1,18 @@
-package com.wahiemWonderEmporium.authentication_service.security;
+package com.wahiemwonderemporium.ordersms.security;
+
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -23,22 +21,6 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
-
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-
-        claims.put("roles", userDetails.getAuthorities().stream().map(role -> new SimpleGrantedAuthority("ROLE_"+ role)).collect(Collectors.toList()));
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-    }
 
     public String extractEmailFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(secret)
@@ -65,8 +47,7 @@ public class JwtUtil {
     }
 
 
-
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token) {
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secret)
@@ -74,14 +55,11 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String username = claims.getSubject();
-
             // Check username and expiration
-            boolean isUsernameValid = userDetails.getUsername().equals(username);
             boolean isTokenExpired = claims.getExpiration().before(new Date());
 
-
-            return isUsernameValid && !isTokenExpired;
+            log.info("isTokenExpired: " + isTokenExpired);
+            return  !isTokenExpired;
 
         } catch (Exception e) {
             log.error("Invalid token provided: {}", e.getMessage());

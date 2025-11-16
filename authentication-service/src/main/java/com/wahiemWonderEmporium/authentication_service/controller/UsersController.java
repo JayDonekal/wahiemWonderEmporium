@@ -4,14 +4,11 @@ import com.wahiemWonderEmporium.authentication_service.model.Users;
 import com.wahiemWonderEmporium.authentication_service.model.viewModel.UsersRequest;
 import com.wahiemWonderEmporium.authentication_service.model.viewModel.UsersResponse;
 import com.wahiemWonderEmporium.authentication_service.service.UsersService;
-import jakarta.annotation.security.RolesAllowed;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,15 +18,15 @@ import static com.wahiemWonderEmporium.authentication_service.utils.Converters.u
 
 @RestController
 @RequestMapping("/api/users")
-
+@AllArgsConstructor
 @Slf4j
 public class UsersController {
 
-    @Autowired
-    private UsersService usersService;
+
+    private final UsersService usersService;
 
     @PostMapping
-    private ResponseEntity<UsersResponse> createNewUser(@RequestBody UsersRequest usersRequest) {
+    public ResponseEntity<UsersResponse> createNewUser(@RequestBody UsersRequest usersRequest) {
 // TODO : Check if user is not in the system before adding anything in.
         log.info("creating New User {}", usersRequest);
         Users user = userRequestDTOtoUsers(usersRequest);
@@ -42,7 +39,7 @@ public class UsersController {
 
     //Never expose the admin user creation. This is only internal. Only Admins can create Admins, hence the duplication.
     @PostMapping("/admin")
-    private ResponseEntity<UsersResponse> createNewAdminUser(@RequestBody UsersRequest usersRequest) {
+    public ResponseEntity<UsersResponse> createNewAdminUser(@RequestBody UsersRequest usersRequest) {
 
         log.info("creating New User {}", usersRequest);
         Users user = userRequestDTOtoUsers(usersRequest);
@@ -54,7 +51,7 @@ public class UsersController {
 
 
     @GetMapping("/username/{username}")
-    private ResponseEntity<UsersResponse> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UsersResponse> getUserByUsername(@PathVariable String username) {
         log.info("retrieving New User by username {}", username);
 
         Users user = usersService.retrieveUserByUsername(username);
@@ -63,8 +60,8 @@ public class UsersController {
     }
 
     @GetMapping("/email/{email}")
-//    @PreAuthorize("hasRole('ADMIN')")
-    private ResponseEntity<UsersResponse> getUserByEmail(@PathVariable String email) {
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UsersResponse> getUserByEmail(@PathVariable String email) {
         log.info("retrieving New User by email {}", email);
 
         Users user = usersService.retrieveUserByEmail(email);
